@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Calculator</string>
+    <string name="calc_btn_point">.</string>
+    <string name="calc_btn_cero">0</string>
+    <string name="calc_btn_resolve">=</string>
+    <string name="calc_btn_one">1</string>
+    <string name="calc_btn_two">2</string>
+    <string name="calc_btn_three">3</string>
+    <string name="calc_btn_sum">+</string>
+    <string name="calc_btn_four">4</string>
+    <string name="calc_btn_five">5</string>
+    <string name="calc_btn_six">6</string>
+    <string name="calc_btn_sub">-</string>
+    <string name="calc_btn_seven">7</string>
+    <string name="calc_btn_eight">8</string>
+    <string name="calc_btn_nine">9</string>
+    <string name="calc_btn_mult">x</string>
+    <string name="calc_btn_div">÷</string>
+    <string name="calc_btn_clear">Clear</string>
+    <string name="message_error_operation">Hubo algun tipo de error. prueba de nuevo</string>
+    <string name="message_error_expresion">La expresion es incorrecta</string>
+    <string name="message_replace">Reemplazable</string>
+</resources>

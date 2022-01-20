@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="common_padding_min">8dp</dimen>
+    <dimen name="calc_btn_text_size">32sp</dimen>
+    <dimen name="calc_btn_sub_size">72sp</dimen>
+    <dimen name="calc_btn_sum_size">48sp</dimen>
+    <dimen name="calc_btn_delete_size">48sp</dimen>
+    <dimen name="common_padding_none">0dp</dimen>
+    <dimen name="common_padding_default">16dp</dimen>
+</resources>
