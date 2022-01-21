@@ -20,13 +20,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.tvOperation.addTextChangedListener { charSequence ->
-            if (canReplaceOperator(charSequence.toString())) {
-                // showMessage(2)
-                val lenght = binding.tvOperation.text.length
-                val newOperation = binding.tvOperation.text.toString().substring(0, lenght-2) +
-                        binding.tvOperation.text.toString().substring(lenght-1)
-                binding.tvOperation.text = newOperation
+        binding.tvOperation.run {
+            addTextChangedListener { charSequence ->
+                if (canReplaceOperator(charSequence.toString())) {
+                    val newStr = text.toString().substring(0, text.length-2) +
+                            text.toString().substring(text.length-1)
+                    text = newStr
+                }
             }
         }
     }
@@ -36,62 +36,53 @@ class MainActivity : AppCompatActivity() {
         val lastElement = charSequence[charSequence.length-1].toString()
         val penultimate = charSequence[charSequence.length-2].toString()
 
-        return (lastElement == OPERATOR_MULTI || lastElement == OPERATOR_DIV || lastElement == OPERATOR_SUM)
-                && (penultimate == OPERATOR_MULTI || penultimate == OPERATOR_DIV ||
-                penultimate == OPERATOR_SUM || penultimate == OPERATOR_SUB)
+        return (lastElement == Constants.OPERATOR_MULTI || lastElement == Constants.OPERATOR_DIV ||
+                lastElement == Constants.OPERATOR_SUM)
+                && (penultimate == Constants.OPERATOR_MULTI || penultimate == Constants.OPERATOR_DIV ||
+                penultimate == Constants.OPERATOR_SUM || penultimate == Constants.OPERATOR_SUB)
     }
 
     fun onClickButton(view: View) {
-        Log.i("CLick", (view as Button).text.toString())
+        // Testing
+        // Log.i("CLick", (view as Button).text.toString())
 
         val valueStr = (view as Button).text.toString()
+        val operation = binding.tvOperation.text.toString()
 
         when(view.id) {
             R.id.btn_delete -> {
-                val length = binding.tvOperation.text.length
-                if(length > 0) {
-                    val newOperation = binding.tvOperation.text.toString().substring(0, length-1)
-                    binding.tvOperation.text = newOperation
+                binding.tvOperation.run {
+                    if (text.length > 0) text = operation.substring(0, text.length-1)
                 }
             }
             R.id.btn_clear -> {
                 binding.tvOperation.text = ""
                 binding.tvResult.text = ""
-
             }
-            R.id.btn_resolve -> {
-                tryResolve(binding.tvOperation.text.toString(), true)
-
-            }
+            R.id.btn_resolve -> tryResolve(operation, true)
             R.id.btn_mult,
             R.id.btn_div,
             R.id.btn_sum,
             R.id.btn_sub -> {
-                tryResolve(binding.tvOperation.text.toString(), false)
+                tryResolve(operation, false)
                 val operator = valueStr
-                val operation = binding.tvOperation.text.toString()
                 addOperator(operator, operation)
             }
-            R.id.btn_point -> {
-                val operation = binding.tvOperation.text.toString()
-                addPoint(valueStr, operation)
-            }
-            else -> {
-                binding.tvOperation.append(valueStr)
-            }
+            R.id.btn_point -> addPoint(valueStr, operation)
+            else -> binding.tvOperation.append(valueStr)
         }
 
     }
 
     private fun addPoint(pointStr: String, operation: String) {
-        if (!operation.contains(POINT)) {
+        if (!operation.contains(Constants.POINT)) {
             binding.tvOperation.append(pointStr)
         } else {
             val operator = getOperator(operation)
             var values = arrayOfNulls<String>(0)
-            if (operator != OPERATOR_NULL) {
-                if (operator == OPERATOR_SUB) {
-                    val index= operation.lastIndexOf(OPERATOR_SUB)
+            if (operator != Constants.OPERATOR_NULL) {
+                if (operator == Constants.OPERATOR_SUB) {
+                    val index= operation.lastIndexOf(Constants.OPERATOR_SUB)
                     if (index < operation.length-1) {
                         values = arrayOfNulls(2)
                         values[0] = operation.substring(0, index)
@@ -109,11 +100,11 @@ class MainActivity : AppCompatActivity() {
                 val numOne = values[0]!!
                 if (values.size > 1) {
                     val numTwo = values[1]!!
-                    if (numOne.contains(POINT) && !numTwo.contains(POINT)) {
+                    if (numOne.contains(Constants.POINT) && !numTwo.contains(Constants.POINT)) {
                         binding.tvOperation.append(pointStr)
                     }
                 } else {
-                    if (numOne.contains(POINT)) {
+                    if (numOne.contains(Constants.POINT)) {
                         binding.tvOperation.append(pointStr)
                     }
                 }
@@ -123,13 +114,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun addOperator(operator: String, operation: String) {
         val lastElement = if (operation.isEmpty()) "" else operation.substring(operation.length-1)
-        if (operator == OPERATOR_SUB) {
-            if (operation.isEmpty() || lastElement != OPERATOR_SUB && lastElement != POINT) {
+        if (operator == Constants.OPERATOR_SUB) {
+            if (operation.isEmpty() || lastElement != Constants.OPERATOR_SUB && lastElement != Constants.POINT) {
                 binding.tvOperation.append(operator)
             }
 
         } else {
-            if (!operation.isEmpty() && lastElement != POINT) {
+            if (!operation.isEmpty() && lastElement != Constants.POINT) {
                 binding.tvOperation.append(operator)
             }
         }
@@ -139,15 +130,15 @@ class MainActivity : AppCompatActivity() {
         if (operationRef.isEmpty()) return
         var operation = operationRef
 
-        if(operation.contains(POINT) && operation.lastIndexOf(POINT) == operation.length -1) {
+        if(operation.contains(Constants.POINT) && operation.lastIndexOf(Constants.POINT) == operation.length -1) {
             operation = operation.substring(0, operation.length -1)
         }
 
         val operator = getOperator(operation)
         var values = arrayOfNulls<String>(0)
-        if (operator != OPERATOR_NULL) {
-            if (operator == OPERATOR_SUB) {
-                val index= operation.lastIndexOf(OPERATOR_SUB)
+        if (operator != Constants.OPERATOR_NULL) {
+            if (operator == Constants.OPERATOR_SUB) {
+                val index= operation.lastIndexOf(Constants.OPERATOR_SUB)
                 if (index < operation.length-1) {
                     values = arrayOfNulls(2)
                     values[0] = operation.substring(0, index)
@@ -174,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                 if (isFromResolve) showMessage(0)
             }
         } else {
-            if (isFromResolve && operator != OPERATOR_NULL) showMessage(1)
+            if (isFromResolve && operator != Constants.OPERATOR_NULL) showMessage(1)
         }
         // Testing
         // Snackbar.make(binding.root, "1:$numOne  2:$numTwo", Snackbar.LENGTH_LONG).show()
@@ -184,18 +175,18 @@ class MainActivity : AppCompatActivity() {
 
         var newOperator = ""
 
-        if (operator.contains(OPERATOR_MULTI)) {
-            newOperator = OPERATOR_SUM
-        } else if (operator.contains(OPERATOR_DIV)) {
-            newOperator = OPERATOR_SUB
-        } else if (operator.contains(OPERATOR_SUM)) {
-            newOperator = OPERATOR_MULTI
+        if (operator.contains(Constants.OPERATOR_MULTI)) {
+            newOperator = Constants.OPERATOR_SUM
+        } else if (operator.contains(Constants.OPERATOR_DIV)) {
+            newOperator = Constants.OPERATOR_SUB
+        } else if (operator.contains(Constants.OPERATOR_SUM)) {
+            newOperator = Constants.OPERATOR_MULTI
         } else {
-            newOperator = OPERATOR_NULL
+            newOperator = Constants.OPERATOR_NULL
         }
 
-        if (newOperator == OPERATOR_NULL && operator.lastIndexOf(OPERATOR_SUB) > 0) {
-            newOperator = OPERATOR_SUB
+        if (newOperator == Constants.OPERATOR_NULL && operator.lastIndexOf(Constants.OPERATOR_SUB) > 0) {
+            newOperator = Constants.OPERATOR_SUB
         }
 
         return newOperator
@@ -205,10 +196,10 @@ class MainActivity : AppCompatActivity() {
         var result = 0.0
 
         when(operator) {
-            OPERATOR_SUM -> result = numOne + numTwo
-            OPERATOR_SUB -> result = numOne - numTwo
-            OPERATOR_MULTI -> result = numOne * numTwo
-            OPERATOR_DIV -> result = numOne / numTwo
+            Constants.OPERATOR_SUM -> result = numOne + numTwo
+            Constants.OPERATOR_SUB -> result = numOne - numTwo
+            Constants.OPERATOR_MULTI -> result = numOne * numTwo
+            Constants.OPERATOR_DIV -> result = numOne / numTwo
         }
 
         return result
@@ -230,16 +221,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         // Snackbar.make(binding.root, getString(R.string.message_error_operation), Snackbar.LENGTH_LONG).show()
-    }
-
-    companion object {
-        const val OPERATOR_SUM = "+"
-        const val OPERATOR_SUB = "-"
-        const val OPERATOR_MULTI = "x"
-        const val OPERATOR_DIV = "÷"
-        const val OPERATOR_NULL = "null"
-        const val POINT = "."
-
     }
 
 }
