@@ -20,4 +20,6 @@
     <string name="message_error_operation">Hubo algun tipo de error. prueba de nuevo</string>
     <string name="message_error_expresion">La expresion es incorrecta</string>
     <string name="message_replace">Reemplazable</string>
+    <string name="message_err_debug">Existe el siguiente Error:</string>
+    <string name="message_num_incorrect">revise sus numeros</string>
 </resources>
