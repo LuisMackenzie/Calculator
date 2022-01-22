@@ -2,13 +2,11 @@ package com.example.calculator
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.core.widget.addTextChangedListener
 import com.example.calculator.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
-import java.lang.NumberFormatException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -23,8 +21,7 @@ class MainActivity : AppCompatActivity() {
         binding.tvOperation.run {
             addTextChangedListener { charSequence ->
                 if (Operations.canReplaceOperator(charSequence.toString())) {
-                    val newStr = text.toString().substring(0, text.length-2) +
-                            text.toString().substring(text.length-1)
+                    val newStr = "${text.substring(0, text.length - 2)}${text.substring(text.length - 1)}"
                     text = newStr
                 }
             }
@@ -49,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                 binding.tvResult.text = ""
             }
             R.id.btn_resolve -> checkOrResolve(operation, true)
+
             R.id.btn_mult,
             R.id.btn_div,
             R.id.btn_sum,
@@ -67,24 +65,9 @@ class MainActivity : AppCompatActivity() {
             binding.tvOperation.append(pointStr)
         } else {
             val operator = Operations.getOperator(operation)
-            var values = arrayOfNulls<String>(0)
-            if (operator != Constants.OPERATOR_NULL) {
-                if (operator == Constants.OPERATOR_SUB) {
-                    val index= operation.lastIndexOf(Constants.OPERATOR_SUB)
-                    if (index < operation.length-1) {
-                        values = arrayOfNulls(2)
-                        values[0] = operation.substring(0, index)
-                        values[1] = operation.substring(index+1)
-                    } else {
-                        values = arrayOfNulls(1)
-                        values[0] = operation.substring(0, index)
-                    }
-                } else {
-                    values = operation.split(operator).toTypedArray()
-                }
-            }
+            val values = Operations.divideOperation(operator, operation)
 
-            if (!values.isEmpty()) {
+            if (values.size > 0) {
                 val numOne = values[0]!!
                 if (values.size > 1) {
                     val numTwo = values[1]!!
@@ -101,7 +84,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addOperator(operator: String, operation: String) {
-        val lastElement = if (operation.isEmpty()) "" else operation.substring(operation.length-1)
+        val lastElement = if (operation.isEmpty()) ""
+        else operation.substring(operation.length-1)
+
         if (operator == Constants.OPERATOR_SUB) {
             if (operation.isEmpty() || lastElement != Constants.OPERATOR_SUB && lastElement != Constants.POINT) {
                 binding.tvOperation.append(operator)

@@ -6,25 +6,20 @@ class Operations {
 
     companion object {
 
-        public fun getOperator(operator: String): String {
-
-            var newOperator = ""
-
-            if (operator.contains(Constants.OPERATOR_MULTI)) {
-                newOperator = Constants.OPERATOR_SUM
-            } else if (operator.contains(Constants.OPERATOR_DIV)) {
-                newOperator = Constants.OPERATOR_SUB
-            } else if (operator.contains(Constants.OPERATOR_SUM)) {
-                newOperator = Constants.OPERATOR_MULTI
+        public fun getOperator(operation: String): String {
+            var operator = if (operation.contains(Constants.OPERATOR_MULTI)) {
+                 Constants.OPERATOR_MULTI
+            } else if (operation.contains(Constants.OPERATOR_DIV)) {
+                Constants.OPERATOR_DIV
+            } else if (operation.contains(Constants.OPERATOR_SUM)) {
+                Constants.OPERATOR_SUM
             } else {
-                newOperator = Constants.OPERATOR_NULL
+                Constants.OPERATOR_NULL
             }
-
-            if (newOperator == Constants.OPERATOR_NULL && operator.lastIndexOf(Constants.OPERATOR_SUB) > 0) {
-                newOperator = Constants.OPERATOR_SUB
+            if (operator == Constants.OPERATOR_NULL && operation.lastIndexOf(Constants.OPERATOR_SUB) > 0) {
+                operator = Constants.OPERATOR_SUB
             }
-
-            return newOperator
+            return operator
         }
 
         public fun canReplaceOperator(charSequence: CharSequence): Boolean {
@@ -32,10 +27,13 @@ class Operations {
             val lastElement = charSequence[charSequence.length-1].toString()
             val penultimate = charSequence[charSequence.length-2].toString()
 
-            return (lastElement == Constants.OPERATOR_MULTI || lastElement == Constants.OPERATOR_DIV ||
-                    lastElement == Constants.OPERATOR_SUM)
-                    && (penultimate == Constants.OPERATOR_MULTI || penultimate == Constants.OPERATOR_DIV ||
-                    penultimate == Constants.OPERATOR_SUM || penultimate == Constants.OPERATOR_SUB)
+            return (lastElement == Constants.OPERATOR_MULTI ||
+                    lastElement == Constants.OPERATOR_DIV ||
+                    lastElement == Constants.OPERATOR_SUM) &&
+                    (penultimate == Constants.OPERATOR_MULTI ||
+                            penultimate == Constants.OPERATOR_DIV ||
+                            penultimate == Constants.OPERATOR_SUM ||
+                            penultimate == Constants.OPERATOR_SUB)
         }
 
         public fun tryResolve(operationRef: String, isFromResolve:Boolean, listener: OnResolveListener) {
@@ -47,22 +45,8 @@ class Operations {
             }
 
             val operator = getOperator(operation)
-            var values = arrayOfNulls<String>(0)
-            if (operator != Constants.OPERATOR_NULL) {
-                if (operator == Constants.OPERATOR_SUB) {
-                    val index= operation.lastIndexOf(Constants.OPERATOR_SUB)
-                    if (index < operation.length-1) {
-                        values = arrayOfNulls(2)
-                        values[0] = operation.substring(0, index)
-                        values[1] = operation.substring(index+1)
-                    } else {
-                        values = arrayOfNulls(1)
-                        values[0] = operationRef.substring(0, index)
-                    }
-                } else {
-                    values = operation.split(operator).toTypedArray()
-                }
-            }
+            val values = divideOperation(operator, operation)
+
             if (values.size > 1) {
                 try {
                     val numberOne = values[0]!!.toDouble()
@@ -80,17 +64,35 @@ class Operations {
             // Snackbar.make(binding.root, "1:$numOne  2:$numTwo", Snackbar.LENGTH_LONG).show()
         }
 
-        private fun getResult(numOne:Double,numTwo:Double,operator:String):Double {
-            var result = 0.0
+        public fun divideOperation(operator: String, operation: String): Array<String?> {
 
-            when(operator) {
-                Constants.OPERATOR_SUM -> result = numOne + numTwo
-                Constants.OPERATOR_SUB -> result = numOne - numTwo
-                Constants.OPERATOR_MULTI -> result = numOne * numTwo
-                Constants.OPERATOR_DIV -> result = numOne / numTwo
+            var values = arrayOfNulls<String>(0)
+
+            if (operator != Constants.OPERATOR_NULL) {
+                if (operator == Constants.OPERATOR_SUB) {
+                    val index = operation.lastIndexOf(Constants.OPERATOR_SUB)
+                    if (index < operation.length-1) {
+                        values = arrayOfNulls(2)
+                        values[0] = operation.substring(0, index)
+                        values[1] = operation.substring(index+1)
+                    } else {
+                        values = arrayOfNulls(1)
+                        values[0] = operation.substring(0, index)
+                    }
+                } else {
+                    values = operation.split(operator).dropLastWhile { it == "" }.toTypedArray()
+                }
             }
+            return values
+        }
 
-            return result
+        private fun getResult(numOne:Double,numTwo:Double,operator:String):Double {
+            return when(operator) {
+                Constants.OPERATOR_MULTI -> numOne * numTwo
+                Constants.OPERATOR_DIV ->  numOne / numTwo
+                Constants.OPERATOR_SUM ->  numOne + numTwo
+                else -> numOne - numTwo
+            }
         }
 
     }
